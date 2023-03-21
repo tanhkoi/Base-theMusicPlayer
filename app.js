@@ -19,7 +19,9 @@ const cdThumb = $('.cd-thumb');
 const audio = $('#audio');
 const playBtn = $('.btn-toggle-play');
 const player = $('.player');
-const loader = $('#progress');
+const loader = $('.progress');
+const btnPrev = $('.btn-prev');
+const btnNext = $('.btn-next');
 
 const app = {
 	currentIndex: 0,
@@ -103,6 +105,19 @@ const app = {
 	handleEvents: function () {
 		const _this = this;
 		const cdWidth = cd.offsetWidth;
+		// Xu ly quay/ dung
+		const cdThumpAnimate = cdThumb.animate(
+			[
+				{
+					transform: 'rotate(360deg)',
+				},
+			],
+			{
+				duration: 10000,
+				iterations: Infinity,
+			}
+		);
+		cdThumpAnimate.pause();
 
 		// xu ly phong to thu nho cd
 		document.onscroll = function () {
@@ -110,6 +125,7 @@ const app = {
 			const newCDWidth = cdWidth - scrollTop;
 			cd.style.width = newCDWidth > 0 ? newCDWidth + 'px' : 0;
 			cd.style.opacity = newCDWidth / cdWidth;
+			
 		};
 
 		// xu ly khi nhan play button
@@ -125,29 +141,45 @@ const app = {
 		audio.onplay = function () {
 			_this.isPlaying = true;
 			player.classList.add('playing');
-			// xu li thanh load
-			audio.ontimeupdate = function () {
-				loader.value = (audio.currentTime / audio.duration) * 100;
-			};
+			cdThumpAnimate.play();
 		};
-
+		// xu li thanh load
+		audio.ontimeupdate = function () {
+			if (audio.duration) {
+				loader.value = (audio.currentTime / audio.duration) * 100;
+			}
+		};
 		// khi song pause
-		audio.onpause = function () {
+		audio.onpause = function () {	
 			_this.isPlaying = false;
 			player.classList.remove('playing');
+			cdThumpAnimate.pause();
 		};
 
 		// xu li tua song
-        loader.onchange = function (e) {
-            const seekTime = (e.target.value / 100) * audio.duration;
-            audio.currentTime = seekTime;
-            console.log(audio.currentTime);
+		loader.onchange = function (e) {
+			const seekTime = (e.target.value / 100) * audio.duration;
+			audio.currentTime = seekTime;
+			console.log(audio.currentTime);
+		};
+		btnNext.onclick = function () {
+			_this.nextSong();
+			audio.play();
 		};
 	},
 	loadCurrentSong: function () {
+		console.log(this.currentSong);
+
 		header.textContent = this.currentSong.name;
 		cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
 		audio.src = this.currentSong.path;
+	},
+	nextSong: function () {
+		this.currentIndex++;
+		if (this.currentIndex >= this.songs.length) {
+			this.currentIndex = 0;
+		}
+		this.loadCurrentSong();
 	},
 	start: function () {
 		this.defineProperties();
