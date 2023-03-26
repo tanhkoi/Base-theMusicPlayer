@@ -166,6 +166,10 @@ const app = {
 			_this.nextSong();
 			audio.play();
 		};
+		btnPrev.onclick = function () {
+			_this.prevSong();
+			audio.play();
+		};
 	},
 	loadCurrentSong: function () {
 		console.log(this.currentSong);
@@ -178,6 +182,13 @@ const app = {
 		this.currentIndex++;
 		if (this.currentIndex >= this.songs.length) {
 			this.currentIndex = 0;
+		}
+		this.loadCurrentSong();
+	},
+	prevSong: function () {
+		this.currentIndex--;
+		if (this.currentIndex < 0) {
+			this.currentIndex = this.songs.length - 1;
 		}
 		this.loadCurrentSong();
 	},
