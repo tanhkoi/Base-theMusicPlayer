@@ -22,10 +22,13 @@ const player = $('.player');
 const loader = $('.progress');
 const btnPrev = $('.btn-prev');
 const btnNext = $('.btn-next');
+const randomBtn = $('.btn-random');
 
 const app = {
 	currentIndex: 0,
 	isPlaying: false,
+	isRandom: false,
+	playedSongs: [],
 	songs: [
 		{
 			name: 'ギラギラ',
@@ -125,7 +128,6 @@ const app = {
 			const newCDWidth = cdWidth - scrollTop;
 			cd.style.width = newCDWidth > 0 ? newCDWidth + 'px' : 0;
 			cd.style.opacity = newCDWidth / cdWidth;
-			
 		};
 
 		// xu ly khi nhan play button
@@ -150,7 +152,7 @@ const app = {
 			}
 		};
 		// khi song pause
-		audio.onpause = function () {	
+		audio.onpause = function () {
 			_this.isPlaying = false;
 			player.classList.remove('playing');
 			cdThumpAnimate.pause();
@@ -162,18 +164,36 @@ const app = {
 			audio.currentTime = seekTime;
 			console.log(audio.currentTime);
 		};
+		// xu li bam next song
 		btnNext.onclick = function () {
-			_this.nextSong();
+			if (_this.isRandom) {
+				_this.playRandomSong();
+			} else {
+				_this.nextSong();
+			}
 			audio.play();
 		};
+		// xu li bam previous song
 		btnPrev.onclick = function () {
-			_this.prevSong();
+			if (_this.isRandom) {
+				_this.playRandomSong();
+			} else {
+				_this.prevSong();
+			}
 			audio.play();
+		};
+		// bat tat random
+		randomBtn.onclick = function () {
+			_this.isRandom = !_this.isRandom;
+			randomBtn.classList.toggle('active', _this.isRandom);
+			playedSongs = [];
+		};
+		// xu li chuyen bai khi bai hat ket thuc
+		audio.onended = function () {
+			btnNext.click();
 		};
 	},
 	loadCurrentSong: function () {
-		console.log(this.currentSong);
-
 		header.textContent = this.currentSong.name;
 		cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
 		audio.src = this.currentSong.path;
@@ -190,6 +210,14 @@ const app = {
 		if (this.currentIndex < 0) {
 			this.currentIndex = this.songs.length - 1;
 		}
+		this.loadCurrentSong();
+	},
+	playRandomSong: function () {
+		var randomIndex;
+		do {
+			randomIndex = Math.floor(Math.random() * this.songs.length);
+		} while (randomIndex === this.currentIndex);
+		this.currentIndex = randomIndex;
 		this.loadCurrentSong();
 	},
 	start: function () {
