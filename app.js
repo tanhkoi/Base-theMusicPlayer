@@ -162,7 +162,6 @@ const app = {
 		loader.onchange = function (e) {
 			const seekTime = (e.target.value / 100) * audio.duration;
 			audio.currentTime = seekTime;
-			console.log(audio.currentTime);
 		};
 		// xu li bam next song
 		btnNext.onclick = function () {
